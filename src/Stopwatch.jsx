@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector, connect } from 'react-redux';
 import { changeRunning, resetClock, setClock } from "./redux/actions";
 import "./Stopwatch.css";
 
-const Stopwatch = () => {
-    let time = useSelector((state) => state.elapsed)
-    const isRunning = useSelector((state) => state.isRunning)
+const Stopwatch = (state) => {
+    let time = useSelector(state => state.stopwatch.elapsed)
+    const isRunning = useSelector(state => state.stopwatch.isRunning)
     const dispatch = useDispatch()
 
+    let intervalId;
     useEffect(() => {
-        let intervalId;
         if (isRunning) {
             intervalId = setInterval(() => dispatch(setClock(++time)), 10)
         }
@@ -21,7 +21,7 @@ const Stopwatch = () => {
     }, []);
 
     const toggleRunning = () => {
-        dispatch(changeRunning(time, isRunning));
+        dispatch(changeRunning(time, isRunning))
     };
 
     const reset = () => {
@@ -55,5 +55,22 @@ const Stopwatch = () => {
     );
 };
 
-export default Stopwatch;
+const mapStateToProps = state => {
+    return {
+        elapsed: state.elapsed,
+        isRunning: state.isRunning,
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        setClock: () => dispatch(setClock()),
+        changeRunning: () => dispatch(changeRunning()),
+        resetClock: () => dispatch(resetClock()),
+        getElapsed: () => dispatch(getElapsed()),
+        getIsRunning: () => dispatch(getIsRunning()),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Stopwatch)
 
